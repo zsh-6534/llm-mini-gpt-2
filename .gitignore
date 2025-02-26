@@ -1,0 +1,5 @@
+.venv
+
+src/model/*
+src/data/*
+src/source/*
