@@ -3,7 +3,8 @@
 .env
 
 src/__pycache__/
-src/data/text/*
-src/data/source/*
+
+# src/data/text/*
+# src/data/source/*
 
 src/model/*
