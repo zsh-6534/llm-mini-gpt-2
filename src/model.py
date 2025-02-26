@@ -229,10 +229,9 @@ class GPT(nn.Module):
             # 拼接新 token
             idx = torch.cat((idx, idx_next), dim=1)
 
+            # 解码 tokenIds -> 文本
             txt = self.enc.decode([idx_next[0].cpu().item()])
 
-            if txt == '。' or txt == '？' or txt == '！' or txt == '”' or txt == '’' or txt == '[UNK]':
-                txt += '\n'
             # 打印预测结果
             print(txt, end='', flush=True)
 

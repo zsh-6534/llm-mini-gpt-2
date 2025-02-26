@@ -70,4 +70,6 @@ py main.py
 
 ![](src/train/小说-1.png)
 
-* eval
+* test
+
+![](src/train/result.jpg)
