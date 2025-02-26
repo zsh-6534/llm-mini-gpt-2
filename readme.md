@@ -5,7 +5,11 @@
 * 环境搭建
 
 ```shell
-cd ./
+# 下载项目
+git clone git@github.com:zsh-6534/llm-mini-gpt-2.git
+
+# 进入项目
+cd ./llm-mini-gpt-2
 
 # 创建虚拟环境
 py -m venv .venv
