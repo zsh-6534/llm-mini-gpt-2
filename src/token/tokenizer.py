@@ -1,13 +1,14 @@
+
+import tiktoken
 from transformers import BertTokenizer
 
 # 太重了 100256
 # Encoder = tiktoken.get_encoding('cl100k_base')
 
-# 太轻了 21128
+# 太轻了 但好在可以自适应适配，21128
 # Encoder = BertTokenizer.from_pretrained("bert-base-chinese")
 
 # 自定义 21128 + n
-
 
 # 文本素材
 vocab_a = [
@@ -76,17 +77,10 @@ Encoder = BertTokenizer.from_pretrained("bert-base-chinese")
 Encoder.add_tokens(vocab_a)
 Encoder.add_tokens(vocab_b)
 
-Encoder.add_tokens(["“", "”", "‘", "’", "......", "..."])
+Encoder.add_tokens(["\n", "\\n", "“", "”", "‘", "’", "......", "..."])
 Encoder.add_special_tokens({'eos_token': '[EOS]'})
 
+# 自定义 tokenizer
 Encoder.save_pretrained("src/token/Encoder")
 
 print("Encoder Loading -> Succeed", len(Encoder))
-
-# 诧异
-[1, 2]
-
-# 诧异
-[1]
-
-# Encoder.save_pretrained("src/token/Encoder")

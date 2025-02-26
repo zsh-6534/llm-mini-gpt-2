@@ -1,14 +1,12 @@
-
-import tiktoken
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from dataclasses import dataclass
 from torch.utils.data import Dataset, DataLoader
+
 import math
-import json
-from transformers import BertTokenizer, AutoTokenizer
+from dataclasses import dataclass
+from transformers import BertTokenizer
+
 torch.manual_seed(1334)
 
 
@@ -16,8 +14,6 @@ Encoder = BertTokenizer.from_pretrained("src/token/Encoder")
 Encoder.model_max_length = 1e8
 # TokenIds
 print("Total TokenIds", len(Encoder))
-
-# 模型配置
 
 
 @dataclass
@@ -37,8 +33,6 @@ class GPTConfig:
 
     # scan
     residual_scale: float = 0.7
-
-# 单头注意力
 
 
 class SingleHeadAttention(nn.Module):
@@ -154,7 +148,7 @@ class GPT(nn.Module):
         # 初始化权重
         self.apply(self._init_weights)
 
-    # 位置编码 sin cos
+    # 位置编码 sin cos, 不参与训练
     def create_sin_cos_embedding(self):
         position = torch.arange(self.block_size).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, self.config.n_embd, 2) * (-math.log(10000.0) / self.config.n_embd))
@@ -250,7 +244,7 @@ class MyDataset(Dataset):
     def __init__(self, path, block_size):
         # 初始化分词器
         self.enc = Encoder
-        self.block_size = block_size   # pos 最大长度
+        self.block_size = block_size
 
         # 自定义终止符
         self.eos_token = self.enc.eos_token_id
@@ -269,7 +263,8 @@ class MyDataset(Dataset):
                 chunk = full_encoded[i:i + self.block_size]
                 # 实际序列，需要 +1，以 eos占位，用以满足 x，y错位，从而获得 loss
                 if len(chunk) < splice_len:
-                    chunk = chunk + [self.eos_token] * (splice_len - len(chunk))
+                    chunk = chunk + [self.eos_token] * \
+                        (splice_len - len(chunk))
 
                 self.encoded_data.append(chunk)
 
@@ -301,7 +296,8 @@ def maxBatchSize(model, config, device):
 
     for bs in range(1, 10):
         try:
-            dummy_input = torch.zeros((bs, config.block_size)).long().to(device)
+            dummy_input = torch.zeros(
+                (bs, config.block_size)).long().to(device)
             with torch.no_grad():
                 logits = model(dummy_input)
 

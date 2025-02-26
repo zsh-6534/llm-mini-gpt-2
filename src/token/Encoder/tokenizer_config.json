@@ -3641,7 +3641,7 @@
       "special": false
     },
     "21577": {
-      "content": "“",
+      "content": "\n",
       "lstrip": false,
       "normalized": true,
       "rstrip": false,
@@ -3649,7 +3649,7 @@
       "special": false
     },
     "21578": {
-      "content": "”",
+      "content": "\\n",
       "lstrip": false,
       "normalized": true,
       "rstrip": false,
@@ -3657,7 +3657,7 @@
       "special": false
     },
     "21579": {
-      "content": "‘",
+      "content": "“",
       "lstrip": false,
       "normalized": true,
       "rstrip": false,
@@ -3665,7 +3665,7 @@
       "special": false
     },
     "21580": {
-      "content": "’",
+      "content": "”",
       "lstrip": false,
       "normalized": true,
       "rstrip": false,
@@ -3673,7 +3673,7 @@
       "special": false
     },
     "21581": {
-      "content": "......",
+      "content": "‘",
       "lstrip": false,
       "normalized": true,
       "rstrip": false,
@@ -3681,6 +3681,22 @@
       "special": false
     },
     "21582": {
+      "content": "’",
+      "lstrip": false,
+      "normalized": true,
+      "rstrip": false,
+      "single_word": false,
+      "special": false
+    },
+    "21583": {
+      "content": "......",
+      "lstrip": false,
+      "normalized": true,
+      "rstrip": false,
+      "single_word": false,
+      "special": false
+    },
+    "21584": {
       "content": "[EOS]",
       "lstrip": false,
       "normalized": false,

@@ -1,10 +1,14 @@
 # 模型预训练
 
+> 基于 GPT-2 模型的预训练，使用的数据集是常见网文，.txt格式即可。
+
 ## VsCode 项目启动
 
-* 环境搭建
+* 环境依赖
 
 ```shell
+# python 3.11
+
 # 下载项目
 git clone git@github.com:zsh-6534/llm-mini-gpt-2.git
 
@@ -13,7 +17,7 @@ cd ./llm-mini-gpt-2
 
 # 创建虚拟环境
 py -m venv .venv
-# 激活虚拟环境
+# 激活虚拟环境 - 这一步很重要哟
 .venv\Scripts\activate
 
 # 安装依赖 部分可能需要科学上网
@@ -32,24 +36,38 @@ https://pytorch.org/get-started/locally/
 py -m pip install -U autopep8
 ```
 
+* 训练脚本
+
+```shell
+# 确保激活环境
+.venv\Scripts\activate
+
+# 数据清洗
+py src/dataset/format.py
+
+# 分词器格式化 
+py src/token/tokenizer.py
+
+# 数据源，有版权之争
+# 自行科学处理数据源（狗头）
+mkdir src/dataset/source
+mkdir src/dataset/target
+```
+
 * 项目启动
 
 ```shell
-# 确保激活文件夹
+# 确保激活环境
 .venv\Scripts\activate
 
 # 启动项目
 py main.py
 ```
 
-* 训练脚本
+## 模型训练
 
-```shell
-# 数据清洗
-py src/format.py
+* batch - loss 曲线
 
-# 分词器格式化
-py src/tokenizer.py
+![](src/train/小说-1.png)
 
-# 原始文本可能有版权之争，需要自行处理
-```
+* eval

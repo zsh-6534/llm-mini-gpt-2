@@ -4,7 +4,8 @@
 
 src/__pycache__/
 
-# src/data/text/*
-# src/data/source/*
+src/dataset/source/*
+src/dataset/target/*
 
+# 太大了
 src/model/*

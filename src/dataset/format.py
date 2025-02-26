@@ -3,24 +3,7 @@ import json
 import ftfy
 
 
-def get_lenegth(input_path):
-
-    with open(input_path, 'r', encoding='utf-8') as f:
-        total = 0
-        row = 0
-        for i, line in enumerate(f):
-            try:
-                text = json.loads(line.strip())['text']
-                # append -> raw
-                total += len(text)
-                row += 1
-            except Exception as e:
-                print("Error encoding line:", e)
-                continue
-        print(row, total, total/row)
-
-
-def format_text(input_path, output_path="src/data/demo-小说.txt"):
+def format_text(input_path, output_path="src/dataset/demo-小说.txt"):
 
     chapter_pattern = re.compile(
         r'^(?:第[0-9一二三四五六七八九十百千]+卷\s+[^\s]+\s+)?'
@@ -41,7 +24,7 @@ def format_text(input_path, output_path="src/data/demo-小说.txt"):
     content = []
 
     with open(input_path, 'r', encoding='utf-8') as f_in, \
-            open(output_path, 'w', encoding='utf-8') as f_txt:
+            open(output_path, 'a', encoding='utf-8') as f_txt:
 
         for line in f_in:
             # 清理和修复文本
@@ -66,4 +49,5 @@ def format_text(input_path, output_path="src/data/demo-小说.txt"):
             f_txt.write('\n'.join(content))
 
 
-format_text("src/source/剑来.txt")
+# 清洗数据
+format_text("src/dataset/source/凡人修仙传.txt", "src/dataset/target/剑来.txt")
