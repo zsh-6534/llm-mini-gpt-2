@@ -61,6 +61,6 @@ def test(text, source="玄幻小说", max_new_tokens=400, temperature=1.0):
         model.generate(text, max_new_tokens, device, temperature)
 
 
-# test('在附近一个小城的酒楼,给人当大掌柜,是他父母口中的大能人。韩家近百年来,可能就出了三叔这么', 3000, 0.92)
+# test('在附近一个小城的酒楼,给人当大掌柜,是他父母口中的大能', "玄幻小说", 512, 0.9)
 
 main(2, "玄幻小说")
