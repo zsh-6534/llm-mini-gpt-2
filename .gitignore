@@ -1,5 +1,8 @@
 .venv
 
-src/model/*
+.env
+
+src/__pycache__/
 src/data/*
 src/source/*
+src/model/*

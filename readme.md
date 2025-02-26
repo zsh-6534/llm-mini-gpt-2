@@ -37,3 +37,15 @@ py -m pip install -U autopep8
 # 启动项目
 py main.py
 ```
+
+* 训练脚本
+
+```shell
+# 数据清洗
+py src/format.py
+
+# 分词器格式化
+py src/tokenizer.py
+
+# 原始文本可能有版权之争，需要自行处理
+```
