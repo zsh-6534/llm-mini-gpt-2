@@ -63,7 +63,8 @@ mkdir src/dataset/target
 # 启动项目
 py main.py
 
-# 模型参数 105.98M
+# 模型参数  105.98M
+# 自己去改超参数就行了
 ```
 
 ## 模型训练
