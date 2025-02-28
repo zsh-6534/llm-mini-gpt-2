@@ -16,6 +16,8 @@ Encoder.model_max_length = 1e8
 print("Total TokenIds", len(Encoder))
 
 
+# 超参数配置
+# 需要根据算力资源调整
 @dataclass
 class GPTConfig:
     block_size: int = 512  # context_length, max_seq 文本最大长度

@@ -62,4 +62,5 @@ def test(text, source="玄幻小说", max_new_tokens=400, temperature=1.0):
 
 # test('在附近一个小城的酒楼,给人当大掌柜,是他父母口中的大能', "凡人修仙传", 800, 1.0)
 
-main(2, "凡人修仙传", 40 * 1e-5, False)
+# 训练批次增加啊 lr 逐步下降
+main(3, "凡人修仙传", 10 * 1e-5, True)

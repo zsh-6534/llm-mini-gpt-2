@@ -62,13 +62,15 @@ mkdir src/dataset/target
 
 # 启动项目
 py main.py
+
+# 模型参数 105.98M
 ```
 
 ## 模型训练
 
 * batch - loss 曲线
 
-![](src/train/小说-1.png)
+![](src/train/凡人修仙传-2-40.png)
 
 * test
 
