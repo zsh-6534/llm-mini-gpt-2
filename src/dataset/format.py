@@ -41,6 +41,7 @@ def format_text(input_path, output_path="src/dataset/demo-小说.txt"):
                     f_txt.write('\n'.join(content))
                     content = []
                 current_title = f"第{chapter_match.group(1)}章 {chapter_match.group(2)}"
+
             else:
                 content.append(line)
 
@@ -49,5 +50,5 @@ def format_text(input_path, output_path="src/dataset/demo-小说.txt"):
             f_txt.write('\n'.join(content))
 
 
-# 清洗数据
-format_text("src/dataset/source/凡人修仙传.txt", "src/dataset/target/剑来.txt")
+# 清洗数据 - 自己随便整个文本都行
+format_text("src/dataset/source/凡人修仙传.txt", "src/dataset/target/凡人修仙传.txt")

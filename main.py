@@ -6,14 +6,16 @@ from src.train import train, eval
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 config = GPTConfig()
+model = GPT(config)
+model.to(device)
 
 
-def main(epochs, source='玄幻小说', lr=1e-4):
+def main(epochs, source='玄幻小说', lr=1e-4, loading=False):
 
     # 1. 设备检测
     # 2. 模型初始化
-    model = GPT(config)
-    model.to(device)
+    if loading:
+        model.load_state_dict(torch.load(f'src/model/{source}.pt')['model_state_dict'])
 
     # 3. 参数量
     total_params = sum(p.numel() for p in model.parameters())
@@ -51,9 +53,6 @@ def main(epochs, source='玄幻小说', lr=1e-4):
 
 
 def test(text, source="玄幻小说", max_new_tokens=400, temperature=1.0):
-
-    model = GPT(config)
-    model.to(device)
     model.load_state_dict(torch.load(f'src/model/{source}.pt')['model_state_dict'])
     model.eval()
 
@@ -61,6 +60,6 @@ def test(text, source="玄幻小说", max_new_tokens=400, temperature=1.0):
         model.generate(text, max_new_tokens, device, temperature)
 
 
-# test('在附近一个小城的酒楼,给人当大掌柜,是他父母口中的大能', "玄幻小说", 512, 0.9)
+# test('在附近一个小城的酒楼,给人当大掌柜,是他父母口中的大能', "凡人修仙传", 800, 1.0)
 
-main(2, "玄幻小说")
+main(2, "凡人修仙传", 40 * 1e-5, False)

@@ -7,6 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # 记录 loss
+
+batch = 1
 loss_records = []
 
 # plot model save path
@@ -15,52 +17,46 @@ train_model = "src/model/"
 
 
 def plot_loss(source, epoch, batch_id, loss, final=False):
-    loss_records.append({'loss': loss, 'epoch': epoch, 'batch_id': batch_id})
-    # 动态绘图初始化
+    global batch
+    loss_records.append({'loss': loss, 'batch': batch, 'epoch': epoch, 'batch_id': batch_id})
+    batch += 1
+    # 动态绘图初始化（仅首次调用时执行）
     if not hasattr(plot_loss, 'fig'):
         plt.ion()
         plot_loss.fig, plot_loss.ax = plt.subplots()
         plot_loss.line, = plot_loss.ax.plot([], [])
-        plot_loss.ax.set_xlabel('Batch')
-        plot_loss.ax.set_ylabel('Loss')
-
-        # 新增y轴格式化
-        plot_loss.ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.4f'))
-        # 新增网格线
+        plot_loss.ax.set_xlabel('Loss / Batch')
+        plot_loss.ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
         plot_loss.ax.grid(True, linestyle='--', alpha=0.5)
-        # 新增实时数值显示文本
-        plot_loss.text = plot_loss.ax.text(
-            0.02, 0.95, '', transform=plot_loss.ax.transAxes)
+        # text 位置
+        plot_loss.text = plot_loss.ax.text(0.5, 0.95, '', transform=plot_loss.ax.transAxes, ha='center')
 
-    # 更新文本内容（新增代码）
-    plot_loss.text.set_text(f'Current Loss: {loss:.4f}')
+    # 使用全部训练数据更新曲线（不再过滤当前epoch）
+    x = [d['batch'] for d in loss_records]
+    y = [d['loss'] for d in loss_records]
 
-    # 更新当前epoch数据
-    current_data = [r for r in loss_records if r['epoch'] == epoch]
-    x = [d['batch_id'] for d in current_data]
-    y = [d['loss'] for d in current_data]
-
-    # 实时更新曲线
+    # 更新文本和曲线数据
+    plot_loss.text.set_text(f'Epoch {epoch} Batch {batch_id} - Loss: {loss:.4f}')
     plot_loss.line.set_data(x, y)
+
+    # 调整坐标轴范围
     plot_loss.ax.relim()
     plot_loss.ax.autoscale_view()
     plot_loss.fig.canvas.draw()
-    plt.pause(0.01)
+    plt.pause(0.001)
 
-    # epoch结束时保存图表
     if final:
-        plt.ioff()
-        full_df = pd.DataFrame(current_data)
+        # 保存时创建新图表，不影响动态绘图窗口
+        full_df = pd.DataFrame([d for d in loss_records])
         full_df['smooth'] = full_df.loss.rolling(20).mean()
 
-        # 使用matplotlib原生绘图控制精度
         fig, ax = plt.subplots()
-        ax.plot(full_df['batch_id'], full_df['smooth'])
-        ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.4f'))  # 设置精度
-        ax.set_title(f'Epoch {epoch} Loss')
+        ax.plot(full_df['batch'], full_df['smooth'])
+        ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
+        ax.set_title(f'Epoch {epoch} Batch {batch_id} - Loss: {loss:.4f}')
         ax.grid(True, linestyle='--', alpha=0.5)
         plt.savefig(f'{train_plot}{source}-{epoch}.png')
-        plt.close()
+        plt.close(fig)  # 仅关闭保存用的临时图表
 
 
 def train(model, optimizer, scheduler, train_loader, source, epoch, device):
@@ -116,7 +112,7 @@ def train(model, optimizer, scheduler, train_loader, source, epoch, device):
         # 计算平均损失
         if batch_id % 2000 == 0 and loss.item() < best_val_loss:
             best_val_loss = loss.item()
-            torch.save(model.state_dict(), f'{train_model}{source}-Dot.pt')
+            # torch.save(model.state_dict(), f'{train_model}{source}-Dot.pt')
 
     return total_loss / len(train_loader)
 

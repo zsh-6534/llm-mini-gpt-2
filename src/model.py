@@ -22,8 +22,8 @@ class GPTConfig:
     batch_size: int = 8    # 输入批次
 
     n_layer: int = 8      # 模型层数 8
-    n_head: int = 8       # num_heads
-    n_embd: int = 768     # hidden_size
+    n_head: int = 10       # num_heads
+    n_embd: int = 640     # hidden_size
     hidden_dim: int = n_embd
     dropout: float = 0.13
 
@@ -88,9 +88,9 @@ class FeedForward(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(config.hidden_dim, 4 * config.hidden_dim),  # 升维
             nn.GELU(),
-            nn.Linear(4 * config.hidden_dim, 3 * config.hidden_dim),  # 中间层
+            nn.Linear(4 * config.hidden_dim, 4 * config.hidden_dim),  # 中间层
             nn.GELU(),
-            nn.Linear(3 * config.hidden_dim, 1 * config.hidden_dim),  # 中间层
+            nn.Linear(4 * config.hidden_dim, 1 * config.hidden_dim),  # 中间层
             # nn.GELU(),
             # nn.Linear(3 * config.hidden_dim, config.hidden_dim),  # 中间层
             nn.Dropout(config.dropout)
@@ -110,7 +110,7 @@ class TransformerBlock(nn.Module):
         self.ln1 = nn.LayerNorm(config.hidden_dim)
         self.ln2 = nn.LayerNorm(config.hidden_dim)
 
-        # 残差连接 - 缩放因子 - 暂时去掉了
+        # 残差连接 - 缩放因子
         scale_init = config.residual_scale / math.sqrt(config.n_layer)
         self.att_scale = nn.Parameter(torch.ones(1) * scale_init)
         self.ffd_scale = nn.Parameter(torch.ones(1) * scale_init)
@@ -133,8 +133,11 @@ class GPT(nn.Module):
 
         # 整合词嵌入（带权重绑定）
         self.token_embedding = nn.Embedding(config.vocab_size, config.n_embd)
-        # 位置编码
+        # 位置编码 可学习位置编码
         self.position_embedding = nn.Embedding(config.block_size, config.n_embd)
+
+        # 位置编码 cos、sin
+        # self.register_buffer('position_embedding', self.create_sin_cos_embedding())
 
         # Transformer Block（保留Pre-LN架构）
         self.blocks = nn.Sequential(*[TransformerBlock(config) for _ in range(config.n_layer)])
@@ -150,9 +153,12 @@ class GPT(nn.Module):
 
     # 位置编码 sin cos, 不参与训练
     def create_sin_cos_embedding(self):
-        position = torch.arange(self.block_size).unsqueeze(1)
+        # 初始位置编码
+        pos = torch.zeros(self.config.block_size, self.config.n_embd,)
+        # 生成位置索引
+        position = torch.arange(0, self.block_size, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, self.config.n_embd, 2) * (-math.log(10000.0) / self.config.n_embd))
-        pos = torch.zeros(self.config.block_size, self.config.n_embd)
+
         pos[:, 0::2] = torch.sin(position * div_term)
         pos[:, 1::2] = torch.cos(position * div_term)
         return pos
@@ -164,7 +170,11 @@ class GPT(nn.Module):
             if module.bias is not None:
                 torch.nn.init.zeros_(module.bias)
         elif isinstance(module, nn.Embedding):
-            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            # 对位置嵌入使用更小的初始化标准差
+            if module is self.position_embedding:
+                torch.nn.init.normal_(module.weight, mean=0.0, std=0.01)
+            else:
+                torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
     def forward(self, idx, targets=None):
         # idx 输入 tokenIds，targets 目标 tokenIds
@@ -173,13 +183,16 @@ class GPT(nn.Module):
         pos_emb = self.position_embedding(
             # 确保 位置编码 与 输入 tokenIds 长度一致
             torch.arange(seq_len, device=idx.device)
-        )
+        ) / math.sqrt(self.config.n_embd)
 
-        # 原始token + pos位置编码
-        x = token_emb + pos_emb / math.sqrt(self.config.n_embd)
+        # cos -sin 位置编码
+        # pos_emb = self.position_embedding[torch.arange(seq_len, device=idx.device)].unsqueeze(0)
+
+        # 原始token + 缩放位置编码
+        x = token_emb + pos_emb
+
         # Transformer Block
         x = self.blocks(x)
-
         # 最终层归一化
         x = self.ln_final(x)
         # 输出层 -> 映射到词向量空间
